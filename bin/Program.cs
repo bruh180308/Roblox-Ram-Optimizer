@@ -264,7 +264,7 @@ class Program {
     static int AutoResumeMinutes = 10;
     static bool GlobalLimitEnabled = false;
     static int GlobalLimitMb = 600;
-    static string UpdateServerUrl = "";
+    static string UpdateServerUrl = "https://bruh180308.github.io/Roblox-Ram-Optimizer/";
 
     // Stats
     static double TotalSavedMb = 0.0;
@@ -354,6 +354,10 @@ class Program {
     // ──────────────────────────────────────────────
     [STAThread]
     static void Main(string[] args) {
+        try {
+            System.Net.ServicePointManager.SecurityProtocol = (System.Net.SecurityProtocolType)3072 | (System.Net.SecurityProtocolType)768;
+        } catch {}
+
         AppDomain.CurrentDomain.UnhandledException += (s, e) => {
             try {
                 File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash.log"), e.ExceptionObject.ToString());
