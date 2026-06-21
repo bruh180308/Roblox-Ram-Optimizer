@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RobloxRAM Optimizer v2.0 - Trình Tối Ưu Hóa RAM Roblox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- Background Animated Orbs -->
+    <div class="orb-container">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="glass-container">
+        <!-- Sidebar / Control Panel -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon-wrapper">
+                    <span class="logo-icon">🎮</span>
+                    <span class="connection-dot status-offline" id="connection-dot" title="Đang kết nối..."></span>
+                </div>
+                <div class="logo-text">
+                    <h1>RobloxRAM</h1>
+                    <span class="version-label">Optimizer v2.0</span>
+                </div>
+            </div>
+
+            <div class="system-stats">
+                <h3>HỆ THỐNG</h3>
+                <div class="stat-circle-container">
+                    <svg class="stat-circle" viewBox="0 0 36 36">
+                        <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path id="system-ram-circle" class="circle-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="circle-text">
+                        <span id="system-ram-percent">0%</span>
+                        <small>RAM Đã Dùng</small>
+                    </div>
+                </div>
+                <div class="stat-details">
+                    <div class="detail-row">
+                        <span>Đang dùng:</span>
+                        <strong id="system-ram-used">0.0 GB</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Còn trống:</span>
+                        <strong id="system-ram-avail">0.0 GB</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Standby (Cache):</span>
+                        <strong id="system-ram-standby">0.0 GB</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Virtual RAM Configuration -->
+            <div class="virtual-ram-card">
+                <h3>💾 RAM Ảo (Pagefile)</h3>
+                <p class="card-desc">Cấu hình bộ nhớ ảo tĩnh trên ổ C. Giúp chạy nhiều tab Roblox (20+ tabs) không bị văng game.</p>
+                <div class="vram-info-row">
+                    <span>Đang thiết lập:</span>
+                    <strong id="current-vram-text">...</strong>
+                </div>
+                <div class="vram-controls">
+                    <select id="select-vram-size" class="glass-select">
+                        <option value="auto">Hệ thống quản lý</option>
+                        <option value="16">16 GB</option>
+                        <option value="32">32 GB</option>
+                        <option value="64">64 GB</option>
+                        <option value="128">128 GB</option>
+                        <option value="250">250 GB</option>
+                    </select>
+                    <button id="btn-set-vram" class="btn btn-sm btn-primary">Set</button>
+                </div>
+                <small class="restart-warning">⚠️ Cần Restart máy tính sau khi Set</small>
+            </div>
+
+            <!-- Online Update Configuration -->
+            <div class="virtual-ram-card" style="margin-top: 12px;">
+                <h3>🔄 Cập Nhật Online</h3>
+                <p class="card-desc">Tự động kiểm tra bản cập nhật mới và tự khởi động lại khi mở tool.</p>
+                <div class="vram-info-row" style="margin-bottom: 6px;">
+                    <span>IP/URL Máy Chủ:</span>
+                </div>
+                <div class="vram-controls" style="flex-direction: column; gap: 8px; align-items: stretch;">
+                    <input type="text" id="input-update-url" class="glass-input" placeholder="http://192.168.1.50:5000" style="width: 100%; box-sizing: border-box;">
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                        <button id="btn-save-update-url" class="btn btn-sm btn-secondary" style="flex: 1; padding: 4px 8px;">Lưu</button>
+                        <button id="btn-check-update" class="btn btn-sm btn-primary" style="flex: 2; padding: 4px 8px;">Check Update</button>
+                    </div>
+                    <button id="btn-export-manifest" class="btn btn-sm btn-secondary" style="width: 100%; padding: 4px 8px; margin-top: 4px;">Tạo update_manifest.json</button>
+                </div>
+                <div id="update-status-area" style="margin-top: 8px; display: none;">
+                    <small id="update-status-text" class="restart-warning" style="color: var(--accent-cyan); display: block; margin-bottom: 6px; font-weight: 500;"></small>
+                    <button id="btn-apply-update" class="btn btn-sm btn-danger" style="width: 100%; padding: 6px 12px; font-weight: 600; font-size: 11px;">Tải & Cập Nhật</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="btn-optimize-all" class="btn btn-primary">
+                    <span class="btn-icon">⚡</span> Tối Ưu Tất Cả (Safe)
+                </button>
+                <button id="btn-clear-standby" class="btn btn-secondary">
+                    <span class="btn-icon">🗑️</span> Dọn Standby Cache
+                </button>
+                <button id="btn-flush-modified" class="btn btn-secondary">
+                    <span class="btn-icon">💾</span> Flush Modified Pages
+                </button>
+                <button id="btn-kill-all" class="btn btn-danger btn-kill-all">
+                    <span class="btn-icon">☠️</span> Kill All Roblox
+                </button>
+            </div>
+
+            <div class="admin-badge offline-badge" id="admin-badge">
+                <span class="badge-icon">🛡️</span> Quyền Administrator
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="footer-row">Uptime: <strong id="server-uptime">00:00:00</strong></div>
+                <div class="footer-row">Status: <span id="connection-text" class="status-text-offline">Mất kết nối</span></div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="welcome-text">
+                    <h2>Roblox Tabs Manager</h2>
+                    <p>Đang chạy: <span id="roblox-count" class="highlight">0</span> tabs | Tổng RAM: <span id="roblox-total-ram" class="highlight">0 MB</span></p>
+                </div>
+                <div class="quick-settings">
+                    <div class="settings-group">
+                        <div class="setting-toggle">
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-auto-optimize">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="toggle-label">Auto Flush RAM <span id="countdown-label" class="countdown-label"></span></span>
+                        </div>
+                        <div class="interval-select">
+                            <span id="interval-label">Mỗi 10 phút</span>
+                            <input type="range" id="range-interval" min="5" max="60" value="10" step="5">
+                        </div>
+                    </div>
+                    <div class="tier-select-container">
+                        <label for="auto-flush-tier-select" class="select-label">Tự Động</label>
+                        <select id="auto-flush-tier-select" class="glass-select">
+                            <option value="safe" selected>Safe Tier (Khuyên dùng)</option>
+                            <option value="moderate">Moderate Tier</option>
+                            <option value="adaptive">Adaptive Tier (Tự động)</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Bar -->
+            <section class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-total-saved">0 GB</div>
+                    <div class="stat-label">Tổng RAM Tiết Kiệm</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-opt-count">0</div>
+                    <div class="stat-label">Số Lần Tối Ưu</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-suspend-count">0</div>
+                    <div class="stat-label">Tabs Đang Đóng Băng</div>
+            </section>
+
+            <!-- Global Limit Section -->
+            <section class="global-limit-area">
+                <div class="limit-info">
+                    <h4>🔒 Giới Hạn RAM Mặc Định (New Tabs)</h4>
+                    <p>Tự động bóp Working Set RAM bằng Job Objects khi phát hiện các tab Roblox mới chạy.</p>
+                </div>
+                <div class="limit-controls">
+                    <div class="setting-toggle">
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-global-limit">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="limit-slider-container">
+                        <span id="global-limit-val">600 MB</span>
+                        <input type="range" id="range-global-limit" min="200" max="3000" value="600" step="50">
+                    </div>
+                </div>
+            </section>
+
+
+
+            <!-- Search / Filter bar -->
+            <section class="filter-bar">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Tìm kiếm theo PID hoặc Label...">
+                </div>
+                <div class="filter-actions">
+                    <button id="btn-bulk-optimize" class="btn btn-sm btn-primary" disabled>Optimize Đã Chọn</button>
+
+                    <button id="btn-bulk-suspend" class="btn btn-sm btn-danger" disabled>Suspend Đã Chọn</button>
+                </div>
+            </section>
+
+            <!-- Compact Process Table -->
+            <section class="process-table-container">
+                <div class="table-scroll-wrapper">
+                    <table class="process-table">
+                        <thead>
+                            <tr>
+                                <th class="col-select"><input type="checkbox" id="select-all-checkbox"></th>
+                                <th class="col-label sortable" data-sort="label">Tên Tab <span class="sort-icon"></span></th>
+                                <th class="col-pid sortable" data-sort="pid">PID <span class="sort-icon"></span></th>
+                                <th class="col-ram sortable" data-sort="ram">RAM <span class="sort-icon"></span></th>
+                                <th class="col-cpu sortable" data-sort="cpu">CPU <span class="sort-icon"></span></th>
+                                <th class="col-threads sortable" data-sort="threads">Threads <span class="sort-icon"></span></th>
+                                <th class="col-status sortable" data-sort="status">Trạng Thái <span class="sort-icon"></span></th>
+                                <th class="col-limit sortable" data-sort="limit">Giới Hạn <span class="sort-icon"></span></th>
+                                <th class="col-actions">Hành Động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="process-table-body">
+                            <!-- Populated in app.js -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="no-process" id="no-process-element">
+                    <div class="no-process-icon">🎮</div>
+                    <h3>Không tìm thấy tab Roblox nào đang chạy</h3>
+                    <p>Vui lòng mở các tab Roblox (RobloxPlayerBeta.exe) để bắt đầu tối ưu hóa.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals / Popups -->
+
+
+    <!-- Confirm Aggressive Dialog -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content glass-card">
+            <h3>⚠️ Cảnh Báo Tối Ưu Hóa Trực Tiếp (Aggressive)</h3>
+            <p>Phương thức tối ưu này sẽ ép toàn bộ RAM của process sang Disk (Page File).</p>
+            <div class="warning-box">
+                <strong>HỆ QUẢ:</strong> Tab Roblox sẽ bị đứng hình (stutter/lag) trong khoảng 2-5 giây khi bạn tương tác lại với game do Windows phải load dữ liệu từ Disk về RAM.
+            </div>
+            <p>Bạn có chắc chắn muốn tiếp tục không?</p>
+            <div class="modal-actions">
+                <button id="btn-confirm-cancel" class="btn btn-secondary">Hủy</button>
+                <button id="btn-confirm-ok" class="btn btn-danger">Vẫn Tối Ưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Kill All Dialog -->
+    <div id="kill-all-modal" class="modal">
+        <div class="modal-content glass-card">
+            <h3>☠️ Xác Nhận Tắt Tất Cả Roblox</h3>
+            <p>Hành động này sẽ tắt ngay lập tức toàn bộ các tiến trình Roblox đang chạy.</p>
+            <div class="warning-box danger">
+                <strong>CẢNH BÁO:</strong> Mọi tài khoản Roblox đang chơi sẽ bị ngắt kết nối và thoát game ngay lập tức!
+            </div>
+            <p>Bạn có chắc chắn muốn tiếp tục không?</p>
+            <div class="modal-actions">
+                <button id="btn-kill-all-cancel" class="btn btn-secondary">Hủy</button>
+                <button id="btn-kill-all-confirm" class="btn btn-danger">Xác Nhận Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RAM Limit Dialog -->
+    <div id="limit-modal" class="modal">
+        <div class="modal-content glass-card">
+            <h3>🔒 Thiết Lập Giới Hạn RAM Cứng</h3>
+            <p>Giới hạn lượng RAM tối đa mà tiến trình <strong id="limit-modal-label">Roblox</strong> có thể sử dụng (qua Working Set).</p>
+            
+            <div class="limit-slider-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <label for="range-limit-val">Giới hạn tối đa:</label>
+                    <span id="limit-val-text" style="font-weight: 600; color: var(--accent-cyan);">600 MB</span>
+                </div>
+                <input type="range" id="range-limit-val" min="200" max="3000" value="600" step="50">
+            </div>
+
+            <div class="limit-presets">
+                <button class="btn btn-secondary btn-sm" data-preset="500">500MB</button>
+                <button class="btn btn-secondary btn-sm" data-preset="1000">1000MB</button>
+                <button class="btn btn-secondary btn-sm" data-preset="1500">1500MB</button>
+                <button class="btn btn-secondary btn-sm" data-preset="2000">2000MB</button>
+                <button class="btn btn-secondary btn-sm" data-preset="3000">3000MB</button>
+            </div>
+
+            <div class="warning-box">
+                <strong>LƯU Ý:</strong> Đặt giới hạn quá thấp (dưới 300MB) có thể khiến Roblox bị giật hoặc đơ trong quá trình tải map nặng.
+            </div>
+
+            <div class="modal-actions">
+                <button id="btn-limit-remove" class="btn btn-danger btn-sm" style="margin-right: auto;">Gỡ Giới Hạn</button>
+                <button id="btn-limit-cancel" class="btn btn-secondary btn-sm">Hủy</button>
+                <button id="btn-limit-save" class="btn btn-primary btn-sm">Áp Dụng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

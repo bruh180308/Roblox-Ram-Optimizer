@@ -1,0 +1,9 @@
+{
+  "auto_optimize": false,
+  "auto_interval_minutes": 5,
+  "auto_flush_tier": "safe",
+  "default_tier": "safe",
+  "auto_resume_minutes": 10,
+  "global_limit_enabled": true,
+  "global_limit_mb": 2000
+}

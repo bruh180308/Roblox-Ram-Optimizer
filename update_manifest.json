@@ -1,0 +1,12 @@
+﻿{
+  "files": {
+    "RobloxRAM_Optimizer.exe": "acf8de8351360978c2090df694428471",
+    "bin/Microsoft.Web.WebView2.Core.dll": "5cfa9dc1d4a3d153542036c3675519ea",
+    "bin/Microsoft.Web.WebView2.WinForms.dll": "f1d70ec78d7aab57b09f57e44f626d0a",
+    "bin/WebView2Loader.dll": "75bf6c40545560e5013313655b110b93",
+    "bin/app.manifest": "e126a2af8d19e37cf45c9dd9086bd989",
+    "bin/frontend/index.html": "a8cc21d2ac2a3349bac430672a3592c6",
+    "bin/frontend/index.css": "7ae318bc96f0d95d6035e50099fefe97",
+    "bin/frontend/app.js": "44a9006fa9ea414b87db1bc6c864a716"
+  }
+}
